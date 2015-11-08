@@ -1,0 +1,81 @@
+在执行 git push 时看到如下消息: 
+
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+经百度后，得知‘matching’ 参数是 Git 1.x 的默认行为，其意是如果你执行 git push 但没有指定分支，它将 push 所有你本地的分支到远程仓库中对应匹配的分支。而 Git 2.x 默认的是 simple，意味着执行 git push 没有指定分支时，只有当前分支会被 push 到你使用 git pull 获取的代码。 
+根据提示，修改git push的行为:
+git config --global push.default matching
+
+再次执行git push 得到解决。 
+更多 
+
+
+push到github时每次都要输入用户名和密码的解决
+ git	 admin  6个月前 (04-30)  259浏览  0评论
+本地clone了一个github项目，修改后输入命令git push -u origin master来提交更新时，每次都要求输入用户名和密码。以为添加到github的ssh key已经失效，所以重新生成了一个ssh key提交了，结果更新了ssh key后每次push还是仍然每次提示需要输入用户名和密码。最终，查阅网上资料，才知道不是ssh key的问题，是提交方式的问题。原来是我origin使用了https方式push，而不是ssh方式。
+
+可以使用git remote -v来查看origin获取和提交方式，如果结果如下：
+
+1
+origin https://github.com/xxx/xxx.git (fetch)
+2
+ 
+3
+origin https://github.com/xxx/xxx.git (push)
+那么将其换成ssh地址即可。把origin换成ssh方式的命令如下：
+
+1
+git remote rm origin
+2
+git remote add origin git@github.com:jinglingshu/scan-framework.git
+3
+git push origin
+执行后，通过命令git remote -v查看结果，如果地址是以ssh地址就可以了。
+
+QQ截图20150430104057
+
+————————————————————————————————————————
+
+为github添加ssh key的方法：
+
+1、创建ssh-key:
+
+执行命令：
+
+1
+ssh-keygen
+然后系统提示输入文件保存位置等信息，连续敲三次回车即可，生成的SSH key文件保存在中～/.ssh/id_rsa.pub
+
+然后用文本编辑工具打开该文件，我用的是vim,所以命令是：
+
+1
+vim ~/.ssh/id_rsa.pub
+接着拷贝.ssh/id_rsa.pub文件内的所以内容，将它粘帖到github帐号管理中的添加SSH key界面中。
+
+2、github添加ssh-key
+
+打开github帐号管理中的添加SSH key界面的步骤如下：
+
+（1）. 登录github
+
+（2）. 点击右上方的Settings图标
+
+（3）. 选择 SSH keys
+
+（4）. 点击 Add SSH key
+
+在出现的界面中填写SSH key的名称，填一个你自己喜欢的名称即可，然后将上面拷贝的~/.ssh/id_rsa.pub文件内容粘帖到key一栏，在点击“add key”按钮就可以了。
+
+QQ截图20150430104612
+
+添加完成后再次执行git clone就可以成功克隆github上的代码库了。
+
+http://www.jinglingshu.org/?p=10482
